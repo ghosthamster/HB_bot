@@ -11,10 +11,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 #bot_functionality
 def bot_start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Драсте! Я ДН-БОТ_V1. Я запам'ятовую дати ваших народжень (якщо поможете) і нагадую Вам ,що ви на 1 рік ближче до 💀 .")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="hi, just write use /add_birthday to add your birthday")
 
 def bot_unknown(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Ти шо? Курча, мене зламати хочеш? Хуй тобі! 🖕")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="U try to hack me? 🖕")
 
 def bot_new_member(update,context):
     for member in update.message.new_chat_members:
@@ -25,13 +25,13 @@ def bot_new_member(update,context):
                 ident = "table" + str(-update.effective_chat.id)
                 curs.execute("""CREATE TABLE IF NOT EXISTS """ + str(ident) + """ (id INT PRIMARY KEY, birthdat DATE)""")
             create_database_table()
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Драсте! Я ДН-БОТ_V1. Я запам'ятовую дати ваших народжень (якщо поможете) і нагадую вам ,що ви на 1 рік ближче до 💀 . Для початку роботи зі мною пропишіть /start")
+            context.bot.send_message(chat_id=update.effective_chat.id, text="hi, just write /start to start work with me")
             break
     else:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Я бачу у вас тут новий ПІДОР. Ну здарасте, здрасте. Я ДН-БОТ. Не забудь добавити мені свою дату народження. ОК? Бо заріжу 🤪")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="hi, a new one, pls add your birthday /add_birthday 🤪")
 
 def bot_add_birthday(update,context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Коли ж ти народився, а?\nВведи дату в такому форматі YYYY-MM-DD")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="enter u birthday date?\nYYYY-MM-DD")
     while(True):
         if update.message.from_user.id == update.effective_user.id:
             def check_date_valid():
