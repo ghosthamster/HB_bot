@@ -3,7 +3,7 @@ import logging
 import sqlite3
 
 #bot_initialize
-updater = Updater(token='910009672:AAEEvUKd4JcAmGMxjqxi0wtd0I3O_mzS9VM', use_context=True)
+updater = Updater(token='Your Token', use_context=True)
 dispatcher = updater.dispatcher
 POLL = 1
 
