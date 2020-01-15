@@ -4,18 +4,19 @@ import logging
 import sqlite3
 
 #bot_initialize
-request_add,request_del,request_change = 1,2,3
+request_add,request_del,request_change,request_show = 1,2,3,4
 
 #logging
 #logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
 
 #other
-def database_execute(db_parse : str):
+def database_execute(db_parse : str, get_info:list = None):
     try:
         db = sqlite3.connect("database.db")
         curs = db.cursor()
         curs.execute(db_parse)
         db.commit()
+        get_info = curs.fetchall()
         db.close()
     except Exception:
         raise Exception
@@ -39,7 +40,12 @@ def bot_change(update,context):
     context.bot.send_message(update.effective_chat.id, "To change your own birthday, simply enter it in format: 'DD.MM.YYYY'.\nTo change you buddy enter his username and birthday just like this: '@BFF = 26.03.2001'\nYou can change multiple friends too: @BFF,@BFF = 26.03.1999,11.11.1000")
     return request_change
 
-#request_handling
+def bot_show(update,context):
+    keys = [['>Current Month<','>Choosen Friend<','>All list<']]
+    context.bot.send_message(update.effective_chat.id, "Choose an option", reply_markup = ReplyKeyboardMarkup(keys,resize_keyboard= True,one_time_keyboard= True))
+    return request_show
+
+# request_handling
 def bot_request_add(update,context):
     try:
         lst_birthday = update.message.text.split('=')
@@ -138,6 +144,20 @@ def bot_request_change(update,context):
         context.bot.send_message(update.effective_chat.id, "Something went wrong!")
         return request_add
 
+def bot_request_show(update,context):
+    msg = update.message.text.strip()
+    lst_birthday = list()
+    print(msg)
+    if msg == ">Current Month<":
+        pass
+    elif msg == ">Choosen Friend<":
+        pass
+    elif msg ==  ">All list<":
+        print("HERE")
+        database_execute("""SELECT * FROM table""" + abs(update.effective_chat.id) + """ ORDER BY day,month;""",lst_birthday)
+        for row in lst_birthday:
+            context.bot.send_message(update.effective_chat.id, "User: " + row[0] + " Birthday: " + row[1] + '.' + row[2] + '.' + row[3])
+    return ConversationHandler.END
 
 def main():
     updater = Updater(token='YOUR TOKEN HERE', use_context=True)
@@ -148,12 +168,15 @@ def main():
     bot_add_handler = ConversationHandler([PrefixHandler('>','Add<',bot_add)],{request_add:[MessageHandler(Filters.text,bot_request_add)]},[])
     bot_del_handler = ConversationHandler([PrefixHandler('>','Delete<',bot_del)],{request_del:[MessageHandler(Filters.text,bot_request_del)]},[])
     bot_change_handler = ConversationHandler([PrefixHandler('>','Change<',bot_change)],{request_change:[MessageHandler(Filters.text,bot_request_change)]},[])
+    bot_show_handler = ConversationHandler([PrefixHandler('>','Show<',bot_show)], {request_show:[MessageHandler(Filters.text,bot_request_show)]},[])
+
 
     #bot_hadlers_registration
     dispatcher.add_handler(bot_start_handler)
     dispatcher.add_handler(bot_add_handler)
     dispatcher.add_handler(bot_del_handler)
     dispatcher.add_handler(bot_change_handler)
+    dispatcher.add_handler(bot_show_handler)
 
     #bot_start
     updater.start_polling()
