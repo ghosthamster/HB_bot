@@ -5,7 +5,7 @@ from telegram.ext import MessageHandler, PrefixHandler, Dispatcher,JobQueue, Fil
 #logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
 
 def main():
-    updater = Updater(token='YOUR TOKEN HERE', use_context=True)
+    updater = Updater(token='910009672:AAEEvUKd4JcAmGMxjqxi0wtd0I3O_mzS9VM', use_context=True)
     dispatcher = updater.dispatcher
 
     #bot_hadlers_creation
@@ -25,9 +25,17 @@ def main():
     dispatcher.add_handler(bot_left_chat_handler)
 
     #Job
-    Tasker = updater.job_queue
-    Tasker.set_dispatcher(updater.dispatcher)
-    Tasker.run_once(bot_reminder,2)
+    file = open("tasker.txt","r+")
+    check = file.read()
+
+    if not check == str(datetime.datetime.now().date()):
+        Tasker = updater.job_queue
+        Tasker.set_dispatcher(updater.dispatcher)
+        Tasker.run_once(bot_reminder,2)
+        Tasker.run_daily(bot_reminder,datetime.time(0,0,1,0))
+        file.write(str(datetime.datetime.now().date()))
+
+    file.close()
 
     #bot_start
     updater.start_polling()
