@@ -1,7 +1,9 @@
 from telegram.ext import Updater, ConversationHandler
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Message
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Message, ParseMode
 from bot_replies import *
 import datetime
+import time
+import random
 import logging
 import sqlite3
 
@@ -15,28 +17,28 @@ def bot_start(update,context):
     database_execute("""INSERT INTO settings (tableid,realid) VALUES (""" + ('0' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + "," + str(update.effective_chat.id) + ");")
     
     keys = [['>Show<','>Add<'],['>Change<','>Delete<']]
-    context.bot.send_message(update.effective_chat.id, bot_reply[start], reply_markup = ReplyKeyboardMarkup(keys,resize_keyboard = True))
+    context.bot.send_message(update.effective_chat.id, bot_reply[start], reply_markup = ReplyKeyboardMarkup(keys,resize_keyboard = True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
 def bot_add(update,context):
-    context.bot.send_message(update.effective_chat.id, bot_reply[add],reply_markup = ReplyKeyboardRemove())
+    context.bot.send_message(update.effective_chat.id, bot_reply[add], parse_mode = ParseMode.MARKDOWN)
     return request_add
 
 def bot_del(update,context):
-    context.bot.send_message(update.effective_chat.id, bot_reply[delete] ,reply_markup = ReplyKeyboardRemove())
+    context.bot.send_message(update.effective_chat.id, bot_reply[delete] , parse_mode = ParseMode.MARKDOWN)
     return request_del
 
 def bot_change(update,context):
-    context.bot.send_message(update.effective_chat.id, bot_reply[change],reply_markup = ReplyKeyboardRemove())
+    context.bot.send_message(update.effective_chat.id, bot_reply[change] , parse_mode = ParseMode.MARKDOWN)
     return request_change
 
 def bot_show(update,context):
     keys = [['>Current<','>Friends<','>All<']]
-    context.bot.send_message(update.effective_chat.id, bot_reply[show] , reply_markup = ReplyKeyboardMarkup(keys, resize_keyboard = True))
+    context.bot.send_message(update.effective_chat.id, bot_reply[show] , reply_markup = ReplyKeyboardMarkup(keys, resize_keyboard = True), parse_mode = ParseMode.MARKDOWN)
     return request_show
 
 def bot_show_friends(update,context):
-    context.bot.send_message(update.effective_chat.id, bot_reply[show_friends], reply_markup = ReplyKeyboardRemove())
+    context.bot.send_message(update.effective_chat.id, bot_reply[show_friends] , parse_mode = ParseMode.MARKDOWN)
     return friends_show
 
 def bot_left_chat(update,context):
@@ -47,7 +49,7 @@ def bot_left_chat(update,context):
 def bot_reminder(context):
     tables = list()
     database_execute("""SELECT name FROM sqlite_master WHERE type='table'""", tables)
-    del tables[-1]
+    tables.remove(('settings',))
 
     if len(tables) == 0:
         return None
@@ -63,8 +65,11 @@ def bot_reminder(context):
         for users in lst_birthday:
             x += str(users[0]) + " "
         
-        context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit else int(table[0][6:]) ,"Happy birthday to " + x)
-
+        if(table[0][5].isdigit()):
+            context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,"* DONT FORGET: * _ today _ {0} _ were born. So wish them all the best! _".format(x), parse_mode = ParseMode.MARKDOWN)
+        else:
+            random.seed(time.time())
+            context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,bot_birthday_msg[random.randint(0,len(bot_birthday_msg) - 1)].format(x), parse_mode = ParseMode.MARKDOWN)
 
 #---------[request_handling]---------
 def bot_request_add(update,context):
@@ -74,7 +79,7 @@ def bot_request_add(update,context):
         if len(lst_birthday) == 1:
             lst_cut = lst_birthday[0].strip().split('.')
             check_date(lst_cut)
-            database_execute("""INSERT INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'@""" + update.effective_user.username + """'"""  + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
+            database_execute("""INSERT OR IGNORE INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'@""" + update.effective_user.username + """'"""  + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
             
         elif len(lst_birthday) == 2:
             lst_dates = lst_birthday[1].split(',')
@@ -82,27 +87,26 @@ def bot_request_add(update,context):
             for user, date in zip(lst_usernames,lst_dates):
                 lst_cut = date.strip().split('.')
                 check_date(lst_cut)
-                database_execute("""INSERT INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'""" + ('@' if user[0] != '@' else '') + user.strip() + """'""" + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
+                database_execute("""INSERT OR IGNORE INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'""" + ('@' if user[0] != '@' else '') + user.strip() + """'""" + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
         else:
             raise birthday_WrongFormat_exception
 
-        context.bot.send_message(update.effective_chat.id, bot_reply[add_request])
+        context.bot.send_message(update.effective_chat.id, bot_reply[add_request],parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
 
     except birthday_WrongFormat_exception:
-        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_format])
+        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_format], parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
     except birthday_WrongDate_exception:
-        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_date])
+        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_date] ,parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
     except birthday_NotDate_exception:
-        context.bot.send_message(update.effective_chat.id, bot_reply[not_a_date])
+        context.bot.send_message(update.effective_chat.id, bot_reply[not_a_date] , parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
 
 def bot_request_del(update,context):
     lst_birthday = update.message.text.split(',')
     for user in lst_birthday:
-        print(user)
         if(user.strip().lower() == "me"):
             database_execute("""DELETE FROM table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ WHERE id = """ + """'@""" + update.effective_user.username + """'""" + """;""")
             if len(lst_birthday) == 1:
@@ -110,17 +114,18 @@ def bot_request_del(update,context):
         else:
             if(update.effective_chat.id < 0):
                 for admin in update.effective_chat.get_administrators():
+                    print(admin)
                     if(update.effective_user.id == admin.user.id):
                         database_execute("""DELETE FROM table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ WHERE id = """ + """'""" + ('@' if user[0].strip() != '@' else '') + user.strip() + """'""" + """;""")
                         break
-                    else:
-                        context.bot.send_message(update.effective_chat.id, bot_reply[not_admin])
-                        return ConversationHandler.END
+                else:
+                    context.bot.send_message(update.effective_chat.id, bot_reply[not_admin], parse_mode = ParseMode.MARKDOWN)
+                    return ConversationHandler.END
             else:
                 database_execute("""DELETE FROM table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ WHERE id = """ + """'""" + ('@' if user[0].strip() != '@' else '') + user.strip() + """'""" + """;""")
                 break
 
-    context.bot.send_message(update.effective_chat.id, bot_reply[delete_request])        
+    context.bot.send_message(update.effective_chat.id, bot_reply[delete_request], parse_mode = ParseMode.MARKDOWN)        
     return ConversationHandler.END
 
 def bot_request_change(update,context):
@@ -139,6 +144,7 @@ def bot_request_change(update,context):
 
             if(update.effective_chat.id < 0): 
                 for admin in update.effective_chat.get_administrators():
+                    print(admin)
                     if(update.effective_user.id == admin.user.id):            
                         for user, date in zip(lst_usernames,lst_dates):
                             lst_cut = date.strip().split('.')
@@ -146,9 +152,9 @@ def bot_request_change(update,context):
                             database_execute("""DELETE FROM table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ WHERE id = """ + """'""" + ('@' if user[0] != '@' else '') + user.strip() + """'""" + """;""")
                             database_execute("""INSERT INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'""" + ('@' if user[0] != '@' else '') +user.strip() + """'""" + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
                         break
-                    else:
-                        context.bot.send_message(update.effective_chat.id, bot_reply[not_admin])            
-                        return ConversationHandler.END
+                else:
+                    context.bot.send_message(update.effective_chat.id, bot_reply[not_admin], parse_mode = ParseMode.MARKDOWN)            
+                    return ConversationHandler.END
             else:
                 for user, date in zip(lst_usernames,lst_dates):
                     lst_cut = date.strip().split('.')
@@ -159,17 +165,17 @@ def bot_request_change(update,context):
         else:
             raise birthday_WrongFormat_exception
 
-        context.bot.send_message(update.effective_chat.id, bot_reply[change_request])
+        context.bot.send_message(update.effective_chat.id, bot_reply[change_request], parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
 
     except birthday_WrongFormat_exception:
-        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_format])
+        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_format] ,parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
     except birthday_WrongDate_exception:
-        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_date])
+        context.bot.send_message(update.effective_chat.id, bot_reply[wrong_date] , parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
     except birthday_NotDate_exception:
-        context.bot.send_message(update.effective_chat.id, bot_reply[not_a_date])
+        context.bot.send_message(update.effective_chat.id, bot_reply[not_a_date] ,parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
 
 def bot_show_all(update,context):
@@ -220,7 +226,7 @@ def bot_show_current_month(update,context):
     else:
         x = bot_reply[empty_month]
 
-    context.bot.send_message(update.effective_chat.id,x, reply_markup = ReplyKeyboardMarkup([['>Show<','>Add<'],['>Change<','>Delete<']],resize_keyboard= True))
+    context.bot.send_message(update.effective_chat.id,x, reply_markup = ReplyKeyboardMarkup([['>Show<','>Add<'],['>Change<','>Delete<']],resize_keyboard= True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
 #---------[other]---------
@@ -243,6 +249,7 @@ def database_execute(db_parse : str, get_info:list = None):
             get_info += list(curs)[:]
         db.close()
     except Exception:
+        print(db_parse)
         raise database_exeption
 
 #---------[bot_exceptions]
