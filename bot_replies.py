@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym,delete_wishes,empty_list = range(31)
 
 bot_reply = {
