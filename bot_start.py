@@ -25,7 +25,7 @@ def main():
     dispatcher.add_handler(bot_left_chat_handler)
     
     #Job
-    file = open("tasker.txt","a+")
+    file = open("tasker.txt","r+")
     check = file.read()
     if not check == str(datetime.datetime.now().date()):
         Tasker = updater.job_queue
