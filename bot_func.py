@@ -9,14 +9,12 @@ import sqlite3
 
 #---------[bot_initialize]---------
 request_add,request_del,request_change,request_show,friends_show,request_settings,feedback_request,custom_wishes_request,request_add_wish = 1,2,3,4,5,6,7,8,9
-logging.basicConfig(filename= "logs.log",level=logging.INFO)
-
 
 #---------[bot_functionality]---------
 def bot_start(update,context):
     database_execute("""CREATE TABLE IF NOT EXISTS table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id TEXT PRIMARY KEY, day INT, month INT, year INT )""" )
     database_execute("""CREATE TABLE IF NOT EXISTS settings"""  + """ (tableid TEXT PRIMARY KEY,  realid INT, defaultBirthday BIT, customWishes TEXT )""")
-    database_execute("""INSERT OR IGNORE INTO settings (tableid,realid,defaultBirthday,customWishes) VALUES ('""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + "'," + str(update.effective_chat.id) +", 0,'');")
+    database_execute("""INSERT OR IGNORE INTO settings (tableid,realid,defaultBirthday,customWishes) VALUES ('""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + "'," + str(update.effective_chat.id) +", 1,'');")
     update.message.reply_text(bot_reply[start], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard = True,selective= True, one_time_keyboard= True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
@@ -68,7 +66,6 @@ def bot_left_chat(update,context):
 
 def bot_reminder(context):
     tables = list()
-    default = list()
     database_execute("""SELECT name FROM sqlite_master WHERE type='table'""", tables)
     tables.remove(('settings',))
 
@@ -77,6 +74,7 @@ def bot_reminder(context):
     
     for table in tables:
         lst_birthday = list()
+        default = list()
         database_execute("""SELECT id FROM """ + table[0] + """ WHERE day = """ + str(datetime.datetime.now().day) + """ AND month = """ + str(datetime.datetime.now().month),lst_birthday)
         database_execute("""SELECT defaultBirthday FROM settings WHERE tableid = '""" + table[0][5:] + """';""",default)
         
@@ -94,8 +92,9 @@ def bot_reminder(context):
             if default[0][0] == 1:
                 context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,bot_birthday_msg[random.randint(0,len(bot_birthday_msg) - 1)].format(x), parse_mode = ParseMode.MARKDOWN)
             else:
-                database_execute("""SELECT customWishes FROM settings WHERE tableid = '""" + table[0][5:] + """';""",default)
-                lst_customWishes = default[1][0].split("###")
+                tmp = list()
+                database_execute("""SELECT customWishes FROM settings WHERE tableid = '""" + table[0][5:] + """';""",tmp)
+                lst_customWishes = tmp[0][0].split("###")
                 context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,lst_customWishes[random.randint(0,len(lst_customWishes) - 2)].format(x), parse_mode = ParseMode.MARKDOWN)
 
 #---------[request_handling]---------
@@ -311,7 +310,6 @@ def database_execute(db_parse : str, get_info:list = None):
             get_info += list(curs)[:]
         db.close()
     except Exception:
-        logging.critical("DataBase: " + db_parse)
         raise database_exeption
 
 #---------[bot_exceptions]-----------
