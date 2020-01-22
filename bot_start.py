@@ -3,7 +3,7 @@ from telegram.ext import MessageHandler, PrefixHandler, Dispatcher,JobQueue, Fil
 import re
 
 def main():
-    updater = Updater(token='YOUR BOT TOKEN', use_context=True)
+    updater = Updater(token='1026666892:AAFXhfsttyEWC3w5hTWm1OpLXlDygtSXznY', use_context=True)
     dispatcher = updater.dispatcher
 
     #bot_hadlers_creation
