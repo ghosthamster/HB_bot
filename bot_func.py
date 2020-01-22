@@ -8,16 +8,15 @@ import logging
 import sqlite3
 
 #---------[bot_initialize]---------
-request_add,request_del,request_change,request_show,friends_show = 1,2,3,4,5
+request_add,request_del,request_change,request_show,friends_show,request_settings,feedback_request = 1,2,3,4,5,6,7
 
 #---------[bot_functionality]---------
 def bot_start(update,context):
     database_execute("""CREATE TABLE IF NOT EXISTS table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id TEXT PRIMARY KEY, day INT, month INT, year INT )""" )
-    database_execute("""CREATE TABLE IF NOT EXISTS settings"""  + """ (tableid TEXT,  realid INT KEY VALUE)""")
-    database_execute("""INSERT INTO settings (tableid,realid) VALUES (""" + ('0' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + "," + str(update.effective_chat.id) + ");")
+    database_execute("""CREATE TABLE IF NOT EXISTS settings"""  + """ (tableid TEXT KEY VALUE,  realid INT, defaultBirthday BIT, customWishes TEXT )""")
+    database_execute("""INSERT INTO settings (tableid,realid,defaultBirthday) VALUES (""" + ('0' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + "," + str(update.effective_chat.id) +", 0);")
     
-    keys = [['>Show<','>Add<'],['>Change<','>Delete<']]
-    context.bot.send_message(update.effective_chat.id, bot_reply[start], reply_markup = ReplyKeyboardMarkup(keys,resize_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    update.message.reply_text(bot_reply[start], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard = True,selective= True, one_time_keyboard= True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
 def bot_add(update,context):
@@ -33,13 +32,23 @@ def bot_change(update,context):
     return request_change
 
 def bot_show(update,context):
-    keys = [['>Current<','>Friends<','>All<']]
-    context.bot.send_message(update.effective_chat.id, bot_reply[show] , reply_markup = ReplyKeyboardMarkup(keys, resize_keyboard = True), parse_mode = ParseMode.MARKDOWN)
+    update.message.reply_text(bot_reply[show] , reply_markup = ReplyKeyboardMarkup(bot_keyboard[show_menu], resize_keyboard = True,selective= True,one_time_keyboard= True), parse_mode = ParseMode.MARKDOWN)
     return request_show
 
 def bot_show_friends(update,context):
     context.bot.send_message(update.effective_chat.id, bot_reply[show_friends] , parse_mode = ParseMode.MARKDOWN)
     return friends_show
+
+def bot_settings(update,context):
+    update.message.reply_text(bot_reply[show], reply_markup = ReplyKeyboardMarkup(bot_keyboard[settings_menu],resize_keyboard=True,one_time_keyboard=True,selective=True), parse_mode = ParseMode.MARKDOWN)
+    return request_settings
+
+def bot_feedback(update,context):
+    context.bot.send_message(update.effective_chat.id, bot_reply[feedback], parse_mode = ParseMode.MARKDOWN)
+    return feedback_request
+
+def bot_custom_wishes(update,context):
+    context.bot.send_message(update.effective_chat.id,bot_reply[show], parse_mode = ParseMode.MARKDOWN, reply_markup = ReplyKeyboardMarkup(bot_keyboard[settings_menu],resize_keyboard=True,one_time_keyboard=True,selective=True))
 
 def bot_left_chat(update,context):
     if update.effective_message.left_chat_member.id == context.bot.id:
@@ -74,24 +83,30 @@ def bot_reminder(context):
 #---------[request_handling]---------
 def bot_request_add(update,context):
     try:
+        already_in = str()
         lst_birthday = update.message.text.split('=')
         
         if len(lst_birthday) == 1:
             lst_cut = lst_birthday[0].strip().split('.')
             check_date(lst_cut)
-            database_execute("""INSERT OR IGNORE INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'@""" + update.effective_user.username + """'"""  + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
-            
+            try:
+                database_execute("""INSERT INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'@""" + update.effective_user.username + """'"""  + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
+            except database_exeption:
+                already_in += '@' + update.effective_user.username
         elif len(lst_birthday) == 2:
             lst_dates = lst_birthday[1].split(',')
             lst_usernames = lst_birthday[0].split(',')
             for user, date in zip(lst_usernames,lst_dates):
                 lst_cut = date.strip().split('.')
                 check_date(lst_cut)
-                database_execute("""INSERT OR IGNORE INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'""" + ('@' if user[0] != '@' else '') + user.strip() + """'""" + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
+                try:
+                    database_execute("""INSERT INTO table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id,day,month,YEAR) VALUES (""" + """'""" + ('@' if user[0] != '@' else '') + user.strip() + """'""" + "," + lst_cut[0] + "," + lst_cut[1] + "," + lst_cut[2] + """);""")
+                except database_exeption:
+                    already_in += user + ' '
         else:
             raise birthday_WrongFormat_exception
-
-        context.bot.send_message(update.effective_chat.id, bot_reply[add_request],parse_mode = ParseMode.MARKDOWN)
+        print("here")
+        context.bot.send_message(update.effective_chat.id, bot_reply[add_request] + (str(bot_reply[sql_already_in] + already_in) if len(already_in) else '') ,parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
 
     except birthday_WrongFormat_exception:
@@ -191,7 +206,7 @@ def bot_show_all(update,context):
     else:
         x = bot_reply[empty_database]
 
-    context.bot.send_message(update.effective_chat.id,x, reply_markup = ReplyKeyboardMarkup([['>Show<','>Add<'],['>Change<','>Delete<']],resize_keyboard= True))
+    update.message.reply_text(x, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True, one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
 def bot_request_show_friends(update,context):
@@ -209,7 +224,7 @@ def bot_request_show_friends(update,context):
             user = "User: " + str(row[0])
             birthday = "Birthday: " + str(row[1]) + '.' + str(row[2]) + '.' + str(row[3]) +"\n"
             x = x + "{0:<20}\n{1:<20}\n".format(user,birthday)
-        context.bot.send_message(update.effective_chat.id, x if len(lst_birth) > 0 else bot_reply[empty_request], reply_markup = ReplyKeyboardMarkup([['>Show<','>Add<'],['>Change<','>Delete<']],resize_keyboard= True))
+        update.message.reply_text(x if len(lst_birth) > 0 else bot_reply[empty_request], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
 
     return ConversationHandler.END
 
@@ -226,10 +241,26 @@ def bot_show_current_month(update,context):
     else:
         x = bot_reply[empty_month]
 
-    context.bot.send_message(update.effective_chat.id,x, reply_markup = ReplyKeyboardMarkup([['>Show<','>Add<'],['>Change<','>Delete<']],resize_keyboard= True),parse_mode = ParseMode.MARKDOWN)
+    update.message.reply_text(x, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
-#---------[other]---------
+def bot_cancel(update,context):
+    update.message.reply_text(bot_reply[cancel], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    return ConversationHandler.END
+
+def bot_feedback_request(update,context):
+    msg = update.effective_message
+    context.bot.send_message(272151950,"FEEDBACK of " + msg.from_user.username + "(" + str(msg.from_user.id) + ") : " + msg.text)
+    context.bot.send_message(660560081,"FEEDBACK of " + msg.from_user.username + "(" + str(msg.from_user.id) + ") : " + msg.text)
+    update.message.reply_text(bot_reply[feedback_req],parse_mode = ParseMode.MARKDOWN, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True))
+    return ConversationHandler.END
+
+def bot_settings_request(update,context):
+    
+    return ConversationHandler.END
+
+#---------[other]--------- 
+
 def check_date(lst_cut: list):
     if len(lst_cut) >= 4 or len(lst_cut) < 3:
         raise birthday_WrongFormat_exception
@@ -249,10 +280,9 @@ def database_execute(db_parse : str, get_info:list = None):
             get_info += list(curs)[:]
         db.close()
     except Exception:
-        print(db_parse)
         raise database_exeption
 
-#---------[bot_exceptions]
+#---------[bot_exceptions]-----------
 class birthday_NotDate_exception(Exception): pass
 class birthday_WrongFormat_exception(Exception): pass
 class birthday_WrongDate_exception(Exception): pass
