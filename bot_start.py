@@ -6,7 +6,7 @@ import re
 #logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
 
 def main():
-    updater = Updater(token='YPUR BOT TOKEN', use_context=True)
+    updater = Updater(token='YOUR BOT TOKEN', use_context=True)
     dispatcher = updater.dispatcher
 
     #bot_hadlers_creation
@@ -19,13 +19,13 @@ def main():
     bot_left_chat_handler = MessageHandler(Filters.status_update.left_chat_member,bot_left_chat)
 
     #bot_hadlers_registration
-    dispatcher.add_handler(bot_start_handler)
     dispatcher.add_handler(bot_add_handler)
+    dispatcher.add_handler(bot_start_handler)
     dispatcher.add_handler(bot_del_handler)
     dispatcher.add_handler(bot_change_handler)
     dispatcher.add_handler(bot_show_handler)
-    dispatcher.add_handler(bot_left_chat_handler)
     dispatcher.add_handler(bot_settings_handler)
+    dispatcher.add_handler(bot_left_chat_handler)
     
     #Job
     file = open("tasker.txt","r+")
@@ -45,7 +45,6 @@ def main():
     #bot_start
     updater.start_polling()
     updater.idle()
-
 
 if __name__ == "__main__":
     main()
