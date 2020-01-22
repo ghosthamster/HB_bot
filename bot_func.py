@@ -8,14 +8,13 @@ import logging
 import sqlite3
 
 #---------[bot_initialize]---------
-request_add,request_del,request_change,request_show,friends_show,request_settings,feedback_request = 1,2,3,4,5,6,7
+request_add,request_del,request_change,request_show,friends_show,request_settings,feedback_request,custom_wishes_request,request_add_wish = 1,2,3,4,5,6,7,8,9
 
 #---------[bot_functionality]---------
 def bot_start(update,context):
     database_execute("""CREATE TABLE IF NOT EXISTS table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ (id TEXT PRIMARY KEY, day INT, month INT, year INT )""" )
-    database_execute("""CREATE TABLE IF NOT EXISTS settings"""  + """ (tableid TEXT KEY VALUE,  realid INT, defaultBirthday BIT, customWishes TEXT )""")
-    database_execute("""INSERT INTO settings (tableid,realid,defaultBirthday) VALUES (""" + ('0' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + "," + str(update.effective_chat.id) +", 0);")
-    
+    database_execute("""CREATE TABLE IF NOT EXISTS settings"""  + """ (tableid TEXT PRIMARY KEY,  realid INT, defaultBirthday BIT, customWishes TEXT )""")
+    database_execute("""INSERT OR IGNORE INTO settings (tableid,realid,defaultBirthday,customWishes) VALUES ('""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + "'," + str(update.effective_chat.id) +", 0,'');")
     update.message.reply_text(bot_reply[start], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard = True,selective= True, one_time_keyboard= True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
@@ -48,20 +47,28 @@ def bot_feedback(update,context):
     return feedback_request
 
 def bot_custom_wishes(update,context):
-    context.bot.send_message(update.effective_chat.id,bot_reply[show], parse_mode = ParseMode.MARKDOWN, reply_markup = ReplyKeyboardMarkup(bot_keyboard[settings_menu],resize_keyboard=True,one_time_keyboard=True,selective=True))
+    update.message.reply_text(bot_reply[show], parse_mode = ParseMode.MARKDOWN, reply_markup = ReplyKeyboardMarkup(bot_keyboard[custom_wishes],resize_keyboard=True,one_time_keyboard=True,selective=True))
+    return custom_wishes_request
+
+def bot_add_wish(update,context):
+    context.bot.send_message(update.effective_chat.id, bot_reply[add_wish], parse_mode = ParseMode.MARKDOWN)
+    return request_add_wish
 
 def bot_left_chat(update,context):
     if update.effective_message.left_chat_member.id == context.bot.id:
-        database_execute("""DELETE FROM settings WHERE tableid = """  + ('0' if update.effective_chat.id < 0 else '') +  str(abs(update.effective_chat.id)) + """;""")
+        database_execute("""DELETE FROM settings WHERE tableid = '"""  + ('C' if update.effective_chat.id < 0 else '') +  str(abs(update.effective_chat.id)) + """';""")
         database_execute("""DROP TABLE table""" + ('C' if update.effective_chat.id < 0 else '') +str(abs(update.effective_chat.id)))    
 
 def bot_reminder(context):
     tables = list()
+    default = list()
     database_execute("""SELECT name FROM sqlite_master WHERE type='table'""", tables)
     tables.remove(('settings',))
 
     if len(tables) == 0:
         return None
+
+    database_execute("""SELECT defaultWishes FROM settings WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""",default)
  
     for table in tables:
         lst_birthday = list()
@@ -74,12 +81,15 @@ def bot_reminder(context):
         for users in lst_birthday:
             x += str(users[0]) + " "
         
-        if(table[0][5].isdigit()):
-            context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,"* DONT FORGET: * _ today _ {0} _ were born. So wish them all the best! _".format(x), parse_mode = ParseMode.MARKDOWN)
+        if(default[0][0] == '1'):
+            if(table[0][5].isdigit()):
+                context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,"* DONT FORGET: * _ today _ {0} _ were born. So wish them all the best! _".format(x), parse_mode = ParseMode.MARKDOWN)
+            else:
+                random.seed(time.time())
+                context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,bot_birthday_msg[random.randint(0,len(bot_birthday_msg) - 1)].format(x), parse_mode = ParseMode.MARKDOWN)
         else:
-            random.seed(time.time())
-            context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,bot_birthday_msg[random.randint(0,len(bot_birthday_msg) - 1)].format(x), parse_mode = ParseMode.MARKDOWN)
-
+            database_execute("""SELECT customWishes FROM settings WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""",default)
+            lst_customWishes = default[0][0].split("###")
 #---------[request_handling]---------
 def bot_request_add(update,context):
     try:
@@ -105,7 +115,6 @@ def bot_request_add(update,context):
                     already_in += user + ' '
         else:
             raise birthday_WrongFormat_exception
-        print("here")
         context.bot.send_message(update.effective_chat.id, bot_reply[add_request] + (str(bot_reply[sql_already_in] + already_in) if len(already_in) else '') ,parse_mode = ParseMode.MARKDOWN)
         return ConversationHandler.END
 
@@ -250,13 +259,31 @@ def bot_cancel(update,context):
 
 def bot_feedback_request(update,context):
     msg = update.effective_message
-    context.bot.send_message(272151950,"FEEDBACK of " + msg.from_user.username + "(" + str(msg.from_user.id) + ") : " + msg.text)
-    context.bot.send_message(660560081,"FEEDBACK of " + msg.from_user.username + "(" + str(msg.from_user.id) + ") : " + msg.text)
+    context.bot.send_message(272151950,"FEEDBACK of " + str(msg.from_user.id) + " : " + msg.text)
+    context.bot.send_message(660560081,"FEEDBACK of " + str(msg.from_user.id) + " : " + msg.text)
     update.message.reply_text(bot_reply[feedback_req],parse_mode = ParseMode.MARKDOWN, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True))
     return ConversationHandler.END
 
-def bot_settings_request(update,context):
-    
+def bot_custom_wishes_request(update,context):
+    if "❌OFF❌" == update.effective_message.text:
+        database_execute("""UPDATE settings SET defaultBirthday = 0 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
+    elif "✅ON✅" == update.effective_message.text:
+        database_execute("""UPDATE settings SET defaultBirthday = 1 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
+    else:
+        update.message.reply_text(bot_reply[wrong_input], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    update.message.reply_text(bot_reply[custom_wishes_req], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    return ConversationHandler.END
+
+def bot_add_wish_request(update,context):
+    wishes_list = update.effective_message.text.split("###")
+    for wish in wishes_list:
+        print(wish)
+        if wish.find("{0}") == -1:
+            print("here")
+            update.message.reply_text(bot_reply[missed_sym], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+            return ConversationHandler.END
+    database_execute("""UPDATE settings SET customWishes = customWishes || '""" + update.effective_message.text.strip() + """###' WHERE tableid = """ + """'""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
+    update.message.reply_text(bot_reply[add_wish_request], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
     return ConversationHandler.END
 
 #---------[other]--------- 
