@@ -1,4 +1,4 @@
-start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month = range(16)
+start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes = range(24)
 
 bot_reply = {
     start          : "_ Greetings! I am BIRTHDAY-bot. I'll help you with your amnesia. Choose option to proceed _",
@@ -7,18 +7,22 @@ bot_reply = {
     change         : "_ To change your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo change you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can change multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
     show           : "_ Choose an option _",
     show_friends   : "_ To see your own birthday, simply type: _ *'me'* _.\nTo see your friend's birthday, enter his username: _ *@BFF* _.\nYou can see multiple birthdays too: _ *@BFF,@BFF*",
-    
-    add_request    : "*Thanks. I updated requested birthdays.*",
-    delete_request : "*Thanks. I deleted all mentioned birthdays!*",
-    change_request : "*Thanks. I changed requested birthdays.*",
+    feedback       : "_ Send me feedback , and I`ll read it...maybe _",
 
+    add_request    : "*Thanks. I've added requested birthdays.*",
+    delete_request : "*Thanks. I've deleted all mentioned birthdays!*",
+    change_request : "*Thanks. I've changed requested birthdays.*",
+    feedback_req   : "*Thanks, I've sent your feedback*",
+
+    cancel         : "*Returning to main menu*",
     wrong_format   : "*Wrong format!*",
     wrong_date     : "*Date is wrong!*",
     not_a_date     : "*Your date is no recognized as a date!*",
     not_admin      : "*Sorry, but only* _ administrators _ *can delete/change other users*",
     empty_database : "*No birthdays in your database*",
     empty_request  : "*No match found!*",
-    empty_month    : "*No birthdays in this month*"
+    empty_month    : "*No birthdays in this month*",
+    sql_already_in : "* Note: those users were not added (already in database):* "
 }
 
 bot_birthday_msg =[
@@ -35,4 +39,11 @@ bot_birthday_msg =[
                     "_ Birthdays are a new start, a fresh beginning and a _ 🕕 _ to pursue new endeavors with new goals. Move forward with confidence and courage. _ 💎 {0} 💎 _ are a very special person. May today and all of your days be amazing! _ ",
                     " {0} _ birthday is the first day of another 365-day journey. Be the shining thread in the beautiful tapestry of the world to make this year the best ever. Enjoy the _ 💰 _ . _ ",
                     " 🍾 * Be happy! * 🍾 _ Today is the day _ {0} _ were brought into this world to be a blessing and inspiration to the people around you! You are a _ 💎 _ person! May you be given more birthdays to fulfill all of your dreams!  _",
-                    ]
+]
+
+bot_keyboard = {
+    main_menu     : [['🎉ADD🎉','🔎SHOW🔎'],['✏️CHANGE✏️','🧹DELETE🧹'],['⚙️SETTINGS⚙️']],
+    show_menu     : [['📆CURRENT📆','🥳FRIENDS🥳','🌎ALL🌎'],['◀️BACK◀️']],
+    settings_menu : [['☄️USE CUSTOM WISHES☄️' ,'📧FEEDBACK📧'],['◀️BACK◀️']],
+    custom_wishes : [['❌','✅']]
+}
