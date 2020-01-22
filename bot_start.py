@@ -2,9 +2,6 @@ from bot_func import *
 from telegram.ext import MessageHandler, PrefixHandler, Dispatcher,JobQueue, Filters, CommandHandler
 import re
 
-#logging
-#logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
-
 def main():
     updater = Updater(token='YOUR BOT TOKEN', use_context=True)
     dispatcher = updater.dispatcher
@@ -28,7 +25,7 @@ def main():
     dispatcher.add_handler(bot_left_chat_handler)
     
     #Job
-    file = open("tasker.txt","r+")
+    file = open("tasker.txt","a+")
     check = file.read()
     if not check == str(datetime.datetime.now().date()):
         Tasker = updater.job_queue
