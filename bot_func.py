@@ -9,6 +9,8 @@ import sqlite3
 
 #---------[bot_initialize]---------
 request_add,request_del,request_change,request_show,friends_show,request_settings,feedback_request,custom_wishes_request,request_add_wish = 1,2,3,4,5,6,7,8,9
+logging.basicConfig(filename= "logs.log",level=logging.INFO)
+
 
 #---------[bot_functionality]---------
 def bot_start(update,context):
@@ -144,7 +146,6 @@ def bot_request_del(update,context):
         else:
             if(update.effective_chat.id < 0):
                 for admin in update.effective_chat.get_administrators():
-                    print(admin)
                     if(update.effective_user.id == admin.user.id):
                         database_execute("""DELETE FROM table""" + ('C' if update.effective_chat.id < 0 else '') + str(abs(update.effective_chat.id)) + """ WHERE id = """ + """'""" + ('@' if user[0].strip() != '@' else '') + user.strip() + """'""" + """;""")
                         break
@@ -174,7 +175,6 @@ def bot_request_change(update,context):
 
             if(update.effective_chat.id < 0): 
                 for admin in update.effective_chat.get_administrators():
-                    print(admin)
                     if(update.effective_user.id == admin.user.id):            
                         for user, date in zip(lst_usernames,lst_dates):
                             lst_cut = date.strip().split('.')
@@ -283,9 +283,7 @@ def bot_custom_wishes_request(update,context):
 def bot_add_wish_request(update,context):
     wishes_list = update.effective_message.text.split("###")
     for wish in wishes_list:
-        print(wish)
         if wish.find("{0}") == -1:
-            print("here")
             update.message.reply_text(bot_reply[missed_sym], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
             return ConversationHandler.END
     database_execute("""UPDATE settings SET customWishes = customWishes || '""" + update.effective_message.text.strip() + """###' WHERE tableid = """ + """'""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
@@ -313,6 +311,7 @@ def database_execute(db_parse : str, get_info:list = None):
             get_info += list(curs)[:]
         db.close()
     except Exception:
+        logging.critical("DataBase: " + db_parse)
         raise database_exeption
 
 #---------[bot_exceptions]-----------
