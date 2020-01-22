@@ -273,6 +273,11 @@ def bot_custom_wishes_request(update,context):
     if "❌OFF❌" == update.effective_message.text:
         database_execute("""UPDATE settings SET defaultBirthday = 1 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
     elif "✅ON✅" == update.effective_message.text:
+        tmp = list()
+        database_execute("""SELECT customWishes FROM settings WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""",tmp)
+        if(tmp[0][0] == ""):
+            update.message.reply_text(bot_reply[empty_list], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)    
+            return ConversationHandler.END
         database_execute("""UPDATE settings SET defaultBirthday = 0 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
     else:
         update.message.reply_text(bot_reply[wrong_input], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
