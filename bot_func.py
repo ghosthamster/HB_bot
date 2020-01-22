@@ -220,7 +220,7 @@ def bot_show_all(update,context):
     else:
         x = bot_reply[empty_database]
 
-    update.message.reply_text(x, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True, one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    update.message.reply_text(x, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True, one_time_keyboard = True))
     return ConversationHandler.END
 
 def bot_request_show_friends(update,context):
@@ -238,7 +238,7 @@ def bot_request_show_friends(update,context):
             user = "User: " + str(row[0])
             birthday = "Birthday: " + str(row[1]) + '.' + str(row[2]) + '.' + str(row[3]) +"\n"
             x = x + "{0:<20}\n{1:<20}\n".format(user,birthday)
-        update.message.reply_text(x if len(lst_birth) > 0 else bot_reply[empty_request], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+        update.message.reply_text(x if len(lst_birth) > 0 else bot_reply[empty_request], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True))
 
     return ConversationHandler.END
 
@@ -255,7 +255,7 @@ def bot_show_current_month(update,context):
     else:
         x = bot_reply[empty_month]
 
-    update.message.reply_text(x, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    update.message.reply_text(x, reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True))
     return ConversationHandler.END
 
 def bot_cancel(update,context):
