@@ -1,28 +1,33 @@
-start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes = range(24)
+start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym = range(29)
 
 bot_reply = {
-    start          : "_ Greetings! I am BIRTHDAY-bot. I'll help you with your amnesia. Choose option to proceed _",
-    add            : "_ To add your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo add you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can add multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
-    delete         : "_ To delete your own birthday, simply type: _ *'me'* _.\nTo delete your friend's birthday, enter his username: _ *@BFF* _.\nYou can delete multiple birthdays too: _ *@BFF,@BFF*",
-    change         : "_ To change your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo change you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can change multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
-    show           : "_ Choose an option _",
-    show_friends   : "_ To see your own birthday, simply type: _ *'me'* _.\nTo see your friend's birthday, enter his username: _ *@BFF* _.\nYou can see multiple birthdays too: _ *@BFF,@BFF*",
-    feedback       : "_ Send me feedback , and I`ll read it...maybe _",
+    start                   : "_ Greetings! I am BIRTHDAY-bot. I'll help you with your amnesia. Choose option to proceed _",
+    add                     : "_ To add your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo add you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can add multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
+    delete                  : "_ To delete your own birthday, simply type: _ *'me'* _.\nTo delete your friend's birthday, enter his username: _ *@BFF* _.\nYou can delete multiple birthdays too: _ *@BFF,@BFF*",
+    change                  : "_ To change your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo change you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can change multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
+    show                    : "_ Choose an option _",
+    show_friends            : "_ To see your own birthday, simply type: _ *'me'* _.\nTo see your friend's birthday, enter his username: _ *@BFF* _.\nYou can see multiple birthdays too: _ *@BFF,@BFF*",
+    feedback                : "_ Send me feedback , and I`ll read it...maybe _",
+    add_wish                : """_ To add your wish, simply send me a text with {0} in it. It's necessarily for showing names of your friends!\nYou can also send me multiple wishes using splitor ###: *your text* ### *your text* _""",
 
-    add_request    : "*Thanks. I've added requested birthdays.*",
-    delete_request : "*Thanks. I've deleted all mentioned birthdays!*",
-    change_request : "*Thanks. I've changed requested birthdays.*",
-    feedback_req   : "*Thanks, I've sent your feedback*",
-
-    cancel         : "*Returning to main menu*",
-    wrong_format   : "*Wrong format!*",
-    wrong_date     : "*Date is wrong!*",
-    not_a_date     : "*Your date is no recognized as a date!*",
-    not_admin      : "*Sorry, but only* _ administrators _ *can delete/change other users*",
-    empty_database : "*No birthdays in your database*",
-    empty_request  : "*No match found!*",
-    empty_month    : "*No birthdays in this month*",
-    sql_already_in : "* Note: those users were not added (already in database):* "
+    add_request             : "*Thanks. I've added requested birthdays.*",
+    delete_request          : "*Thanks. I've deleted all mentioned birthdays!*",
+    change_request          : "*Thanks. I've changed requested birthdays.*",
+    feedback_req            : "*Thanks, I've sent your feedback*",
+    custom_wishes_req       : "*Thanks, I've updated your settings*" ,
+    add_wish_request        : "*Thanks. I've added all your wishes.*",
+ 
+    cancel                  : "*Returning to main menu*",
+    wrong_format            : "*Wrong format!*",
+    wrong_date              : "*Date is wrong!*",
+    not_a_date              : "*Your date is no recognized as a date!*",
+    not_admin               : "*Sorry, but only* _ administrators _ *can delete/change other users*",
+    empty_database          : "*No birthdays in your database*",
+    empty_request           : "*No match found!*",
+    empty_month             : "*No birthdays in this month*",
+    sql_already_in          : "* Note: those users were not added (already in database):* ",
+    wrong_input             : "*Can't recognize input*",
+    missed_sym              : "* {0} is missed!*"
 }
 
 bot_birthday_msg =[
@@ -44,6 +49,6 @@ bot_birthday_msg =[
 bot_keyboard = {
     main_menu     : [['🎉ADD🎉','🔎SHOW🔎'],['✏️CHANGE✏️','🧹DELETE🧹'],['⚙️SETTINGS⚙️']],
     show_menu     : [['📆CURRENT📆','🥳FRIENDS🥳','🌎ALL🌎'],['◀️BACK◀️']],
-    settings_menu : [['☄️USE CUSTOM WISHES☄️' ,'📧FEEDBACK📧'],['◀️BACK◀️']],
-    custom_wishes : [['❌','✅']]
+    settings_menu : [['☄️USE_CUSTOM_WISHES☄️' ,'📧FEEDBACK📧'],['➕ADD_CUSTOM_WISHES➕'],['◀️BACK◀️']],
+    custom_wishes : [['❌OFF❌','✅ON✅']]
 }
