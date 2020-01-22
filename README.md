@@ -1,5 +1,5 @@
 # HB_bot
-Python Telegram bot wich tell you if someone have a birthday
+Python Telegram bot which tell you if someone has a birthday
 
 
 Install telegramAPI module
