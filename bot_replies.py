@@ -1,7 +1,7 @@
 start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym,delete_wishes,empty_list = range(31)
 
 bot_reply = {
-    start                   : "_Greetings human 👋!\nI am 🎉🤡🍾-bot. I'll help you with your (◐▂◑ ).\nChoose option to 👌 _",
+    start                   : "_Greetings human 👋!\nI am 🎉🤡🍾-bot. I'll help you with your (◐▂◑ )\n But i work onli with your usernames so add it to your profile.\nChoose option to 👌 _",
     add                     : "_To add your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo add you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can add multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
     delete                  : "_To delete your own birthday, simply type: _ *'me'* _.\nTo delete your friend's birthday, enter his username: _ *@BFF* _.\nYou can delete multiple birthdays too: _ *@BFF,@BFF*",
     change                  : "_To change your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo change you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can change multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
