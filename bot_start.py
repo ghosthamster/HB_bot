@@ -31,7 +31,6 @@ def main():
         Tasker = updater.job_queue
         Tasker.set_dispatcher(updater.dispatcher)
         Tasker.run_once(bot_reminder,2)
-        Tasker.run_daily(bot_reminder,datetime.time(0,0,1,0))
         file.close()
         
         file = open("tasker.txt","w")
