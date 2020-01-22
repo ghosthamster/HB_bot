@@ -1,4 +1,4 @@
-start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym,delete_wishes = range(30)
+start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym,delete_wishes,empty_list = range(31)
 
 bot_reply = {
     start                   : "_Greetings human 👋!\nI am 🎉🤡🍾-bot. I'll help you with your (◐▂◑ ).\nChoose option to 👌 _",
@@ -28,7 +28,8 @@ bot_reply = {
     empty_month             : "*No birthdays in this month*",
     sql_already_in          : "* Note: those users were not added (already in database):* ",
     wrong_input             : "*Can't recognize input*",
-    missed_sym              : "* {0} is missed!*"
+    missed_sym              : "* {0} is missed!*",
+    empty_list              : "*There is no custom wishes in your group!*"
 }
 
 bot_birthday_msg =[
