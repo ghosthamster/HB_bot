@@ -54,6 +54,11 @@ def bot_add_wish(update,context):
     context.bot.send_message(update.effective_chat.id, bot_reply[add_wish], parse_mode = ParseMode.MARKDOWN)
     return request_add_wish
 
+def bot_delete_wishes(update,context):
+    database_execute("""UPDATE settings SET customWishes = '' WHERE tableid = '"""  + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
+    update.message.reply_text(bot_reply[delete_wishes], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
+    return ConversationHandler.END 
+
 def bot_left_chat(update,context):
     if update.effective_message.left_chat_member.id == context.bot.id:
         database_execute("""DELETE FROM settings WHERE tableid = '"""  + ('C' if update.effective_chat.id < 0 else '') +  str(abs(update.effective_chat.id)) + """';""")
@@ -67,12 +72,11 @@ def bot_reminder(context):
 
     if len(tables) == 0:
         return None
-
-    database_execute("""SELECT defaultWishes FROM settings WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""",default)
- 
+    
     for table in tables:
         lst_birthday = list()
         database_execute("""SELECT id FROM """ + table[0] + """ WHERE day = """ + str(datetime.datetime.now().day) + """ AND month = """ + str(datetime.datetime.now().month),lst_birthday)
+        database_execute("""SELECT defaultBirthday FROM settings WHERE tableid = '""" + table[0][5:] + """';""",default)
         
         if len(lst_birthday) == 0:
             continue
@@ -81,15 +85,17 @@ def bot_reminder(context):
         for users in lst_birthday:
             x += str(users[0]) + " "
         
-        if(default[0][0] == '1'):
-            if(table[0][5].isdigit()):
-                context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,"* DONT FORGET: * _ today _ {0} _ were born. So wish them all the best! _".format(x), parse_mode = ParseMode.MARKDOWN)
-            else:
-                random.seed(time.time())
-                context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,bot_birthday_msg[random.randint(0,len(bot_birthday_msg) - 1)].format(x), parse_mode = ParseMode.MARKDOWN)
+        if(table[0][5].isdigit()):
+            context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,"* DONT FORGET: * _ today _ {0} _ were born. So wish them all the best! _".format(x), parse_mode = ParseMode.MARKDOWN)
         else:
-            database_execute("""SELECT customWishes FROM settings WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""",default)
-            lst_customWishes = default[0][0].split("###")
+            random.seed(time.time())
+            if default[0][0] == 1:
+                context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,bot_birthday_msg[random.randint(0,len(bot_birthday_msg) - 1)].format(x), parse_mode = ParseMode.MARKDOWN)
+            else:
+                database_execute("""SELECT customWishes FROM settings WHERE tableid = '""" + table[0][5:] + """';""",default)
+                lst_customWishes = default[1][0].split("###")
+                context.bot.send_message(int(table[0][5:]) if table[0][5].isdigit() else -(int(table[0][6:])) ,lst_customWishes[random.randint(0,len(lst_customWishes) - 2)].format(x), parse_mode = ParseMode.MARKDOWN)
+
 #---------[request_handling]---------
 def bot_request_add(update,context):
     try:
@@ -266,9 +272,9 @@ def bot_feedback_request(update,context):
 
 def bot_custom_wishes_request(update,context):
     if "❌OFF❌" == update.effective_message.text:
-        database_execute("""UPDATE settings SET defaultBirthday = 0 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
-    elif "✅ON✅" == update.effective_message.text:
         database_execute("""UPDATE settings SET defaultBirthday = 1 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
+    elif "✅ON✅" == update.effective_message.text:
+        database_execute("""UPDATE settings SET defaultBirthday = 0 WHERE tableid = '""" + ("C" if update.effective_chat.id < 0 else "") + str(abs(update.effective_chat.id)) + """';""")
     else:
         update.message.reply_text(bot_reply[wrong_input], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
     update.message.reply_text(bot_reply[custom_wishes_req], reply_markup = ReplyKeyboardMarkup(bot_keyboard[main_menu],resize_keyboard= True,selective= True,one_time_keyboard = True),parse_mode = ParseMode.MARKDOWN)
