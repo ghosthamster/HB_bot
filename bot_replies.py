@@ -3,12 +3,12 @@ start,add,delete,change,show,show_friends,add_request,delete_request,change_requ
 bot_reply = {
     start                   : "_Greetings human 👋!\nI am 🎉🤡🍾-bot. I'll help you with your (◐▂◑ ).\nChoose option to 👌 _",
     add                     : "_To add your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo add you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can add multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
-    delete                  : "_ To delete your own birthday, simply type: _ *'me'* _.\nTo delete your friend's birthday, enter his username: _ *@BFF* _.\nYou can delete multiple birthdays too: _ *@BFF,@BFF*",
-    change                  : "_ To change your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo change you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can change multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
-    show                    : "_ Choose an option _",
-    show_friends            : "_ To see your own birthday, simply type: _ *'me'* _.\nTo see your friend's birthday, enter his username: _ *@BFF* _.\nYou can see multiple birthdays too: _ *@BFF,@BFF*",
-    feedback                : "_ Send me feedback , and I`ll read it...maybe _",
-    add_wish                : """_ To add your wish, simply send me a text with {0} in it. It's necessarily for showing names of your friends!\nYou can also send me multiple wishes using splitor ###: *your text* ### *your text* _""",
+    delete                  : "_To delete your own birthday, simply type: _ *'me'* _.\nTo delete your friend's birthday, enter his username: _ *@BFF* _.\nYou can delete multiple birthdays too: _ *@BFF,@BFF*",
+    change                  : "_To change your own birthday, simply enter it in format: _ *'DD.MM.YYYY'* _.\nTo change you buddy enter his username and birthday just like this: _ *@BFF = 26.03.2001'* _ \nYou can change multiple friends too: _ *@BFF,@BFF = 26.03.1999,11.11.1000*",
+    show                    : "_Choose an option _",
+    show_friends            : "_To see your own birthday, simply type: _ *'me'* _.\nTo see your friend's birthday, enter his username: _ *@BFF* _.\nYou can see multiple birthdays too: _ *@BFF,@BFF*",
+    feedback                : "_Send me feedback , and I`ll read it...maybe _",
+    add_wish                : """_To add your wish, simply send me a text with {0} in it. It's necessarily for showing names of your friends!\nYou can also send me multiple wishes using splitor ###: *your text* ### *your text* _""",
     delete_wishes           : "*Thanks. I've deleted all custom wishes*",
 
     add_request             : "*Thanks. I've added requested birthdays.*",
