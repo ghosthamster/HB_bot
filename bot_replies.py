@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym,delete_wishes,empty_list = range(31)
+start,add,delete,change,show,show_friends,add_request,delete_request,change_request,wrong_format,wrong_date,not_a_date, not_admin,empty_database,empty_request,empty_month,sql_already_in,cancel,main_menu,show_menu,settings_menu,feedback,feedback_req,custom_wishes,wrong_input,custom_wishes_req,add_wish_request,add_wish,missed_sym,delete_wishes,empty_list,wishes_menu,no_username = range(33)
 
 bot_reply = {
     start                   : "_Greetings human 👋!\nI am 🎉🤡🍾-bot. I'll help you with your (◐▂◑ ).\nI work only with usernames,so you should have one!\nChoose option to 👌 _",
@@ -30,7 +29,8 @@ bot_reply = {
     sql_already_in          : "* Note: those users were not added (already in database):* ",
     wrong_input             : "*Can't recognize input*",
     missed_sym              : "* {0} is missed!*",
-    empty_list              : "*There is no custom wishes in your group!*"
+    empty_list              : "*There is no custom wishes in your group!*",
+    no_username             : "*😥, but I work only with usernames...and you don't have one.\nCome back, with your brand-new username and I'll open my 💖 for you!*"
 }
 
 bot_birthday_msg =[
@@ -50,8 +50,10 @@ bot_birthday_msg =[
 ]
 
 bot_keyboard = {
-    main_menu     : [['🎉ADD🎉','🔎SHOW🔎'],['✏️CHANGE✏️','🧹DELETE🧹'],['⚙️SETTINGS⚙️']],
+    main_menu     : [['🎉ADD🎉','🔎SHOW🔎'],['✏️CHANGE✏️','🧹DELETE🧹'],['✍️WISHES✍️','⚙️SETTINGS⚙️']],
     show_menu     : [['📆CURRENT📆','🥳FRIENDS🥳','🌎ALL🌎'],['◀️BACK◀️']],
-    settings_menu : [['☄️USE_CUSTOM_WISHES☄️','➕ADD_CUSTOM_WISHES➕'],['🗑️DELETE_ALL_WISHES🗑️'],['📧FEEDBACK📧'],['◀️BACK◀️']],
-    custom_wishes : [['❌OFF❌','✅ON✅']]
+    settings_menu : [['☄️USE_CUSTOM_WISHES☄️'],['📧FEEDBACK📧'],['◀️BACK◀️']],
+    custom_wishes : [['❌OFF❌','✅ON✅']],
+    wishes_menu   : [['➕ADD➕','🗑️DELETE_ALL🗑️','📋SHOW📋'],['◀️BACK◀️']]
+
 }

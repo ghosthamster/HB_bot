@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 from bot_func import *
 from telegram.ext import MessageHandler, PrefixHandler, Dispatcher,JobQueue, Filters, CommandHandler
 import re
 
 def main():
-    updater = Updater(token='YOUR TOKEN', use_context=True)
+    updater = Updater(token='1026666892:AAFXhfsttyEWC3w5hTWm1OpLXlDygtSXznY', use_context=True)
     dispatcher = updater.dispatcher
 
     #bot_hadlers_creation
@@ -12,8 +11,45 @@ def main():
     bot_add_handler = ConversationHandler([PrefixHandler('🎉','ADD🎉',bot_add)],{request_add:[MessageHandler(Filters.text,bot_request_add)]},[])
     bot_del_handler = ConversationHandler([PrefixHandler('🧹','DELETE🧹',bot_del)],{request_del:[MessageHandler(Filters.text,bot_request_del)]},[])
     bot_change_handler = ConversationHandler([PrefixHandler('✏️','CHANGE✏️',bot_change)],{request_change:[MessageHandler(Filters.text,bot_request_change)]},[])
-    bot_show_handler = ConversationHandler([PrefixHandler('🔎','SHOW🔎',bot_show)], {request_show:[PrefixHandler('🌎','ALL🌎',bot_show_all),PrefixHandler('◀️','BACK◀️',bot_cancel),PrefixHandler('📆','CURRENT📆',bot_show_current_month),ConversationHandler([PrefixHandler('🥳','FRIENDS🥳',bot_show_friends)],{friends_show:[MessageHandler(Filters.text,bot_request_show_friends)]},[],map_to_parent= {ConversationHandler.END : ConversationHandler.END })]},[])
-    bot_settings_handler = ConversationHandler([PrefixHandler('⚙️','SETTINGS⚙️',bot_settings)],{request_settings:[PrefixHandler('🗑️','DELETE_ALL_WISHES🗑️',bot_delete_wishes),PrefixHandler('◀️','BACK◀️',bot_cancel),ConversationHandler([PrefixHandler('➕','ADD_CUSTOM_WISHES➕',bot_add_wish)],{request_add_wish : [MessageHandler(Filters.text,bot_add_wish_request)]},[],map_to_parent={ConversationHandler.END : ConversationHandler.END}),ConversationHandler([PrefixHandler('☄️','USE_CUSTOM_WISHES☄️',bot_custom_wishes)], {custom_wishes_request : [MessageHandler(Filters.text,bot_custom_wishes_request)]},[],map_to_parent= {ConversationHandler.END : ConversationHandler.END }),ConversationHandler([PrefixHandler('📧','FEEDBACK📧',bot_feedback)],{feedback_request : [MessageHandler(Filters.text,bot_feedback_request)]},[],map_to_parent= {ConversationHandler.END : ConversationHandler.END })]},[])
+    bot_show_handler = ConversationHandler(
+                            [PrefixHandler('🔎','SHOW🔎',bot_show)], 
+                            {request_show:[PrefixHandler('🌎','ALL🌎',bot_show_all),
+                                       PrefixHandler('◀️','BACK◀️',bot_cancel),
+                                       PrefixHandler('📆','CURRENT📆',bot_show_current_month),
+                                       ConversationHandler(
+                                           [PrefixHandler('🥳','FRIENDS🥳',bot_show_friends)],
+                                           {friends_show:[MessageHandler(Filters.text,bot_request_show_friends)]},
+                                           [],map_to_parent= {ConversationHandler.END : ConversationHandler.END })]
+                            },[])
+    bot_settings_handler = ConversationHandler(
+                            [PrefixHandler('⚙️','SETTINGS⚙️',bot_settings)],
+                            {request_settings:[PrefixHandler('🗑️','DELETE_ALL_WISHES🗑️',bot_delete_wishes),
+                                               PrefixHandler('◀️','BACK◀️',bot_cancel),
+                                               ConversationHandler(
+                                                    [PrefixHandler('➕','ADD_CUSTOM_WISHES➕',bot_add_wish)],
+                                                    {request_add_wish : [MessageHandler(Filters.text,bot_add_wish_request)]},
+                                                    [],map_to_parent={ConversationHandler.END : ConversationHandler.END}),
+                                               ConversationHandler(
+                                                    [PrefixHandler('☄️','USE_CUSTOM_WISHES☄️',bot_custom_wishes)], 
+                                                    {custom_wishes_request : [MessageHandler(Filters.text,bot_custom_wishes_request)]},
+                                                    [],map_to_parent= {ConversationHandler.END : ConversationHandler.END }),
+                                               ConversationHandler(
+                                                    [PrefixHandler('📧','FEEDBACK📧',bot_feedback)],
+                                                    {feedback_request : [MessageHandler(Filters.text,bot_feedback_request)]},
+                                                    [],map_to_parent= {ConversationHandler.END : ConversationHandler.END })]
+                            },[])
+
+    bot_wishes_handler = ConversationHandler(
+                            [PrefixHandler('✍️','WISHES✍️',bot_wishes)],
+                            {request_wish:[PrefixHandler('🗑️','DELETE_ALL🗑️',bot_delete_wishes),
+                                           PrefixHandler('◀️','BACK◀️',bot_cancel),
+                                           PrefixHandler('📋','SHOW📋',bot_wish_show),
+                                           ConversationHandler(
+                                                [PrefixHandler('➕','ADD➕',bot_add_wish)],
+                                                {request_add_wish : [MessageHandler(Filters.text,bot_add_wish_request)]},
+                                                [],map_to_parent={ConversationHandler.END : ConversationHandler.END})]
+                            },[])
+
     bot_left_chat_handler = MessageHandler(Filters.status_update.left_chat_member,bot_left_chat)
 
     #bot_hadlers_registration
@@ -23,6 +59,7 @@ def main():
     dispatcher.add_handler(bot_change_handler)
     dispatcher.add_handler(bot_show_handler)
     dispatcher.add_handler(bot_settings_handler)
+    dispatcher.add_handler(bot_wishes_handler)
     dispatcher.add_handler(bot_left_chat_handler)
     
     #Job
